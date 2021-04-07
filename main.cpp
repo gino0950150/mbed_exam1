@@ -15,72 +15,64 @@ Thread t;
 Thread q;
 Thread r;
 float period = 1;
-int sample = 100;
-float ADCdata[100];
+int sample = 1000;
+float ADCdata[1000];
 Timer T;
 float sel = 0.125;
+float fs = 1000;
 
 void OutputA(){
   // float p = period - 33;
   float i;
   float j = 0;
   float k = 80000 * (1 - sel);
+  float x = 80000 * (1 - sel);
   float step = 1 / (80*sel);
   int c = 0;
-  printf("%f\n", step);
-  while (1)
+  int index = 0;
+  // printf("%f\n", step);
+  while (index < sample)
   {
     j = 0;
-    for(c = 0; c < 80; c++) {
+    for(c = 0; c < 80 && index < sample; c++) {
       // T.start();
       Sout = j;
-      wait_us(1000);
+      wait_us(1000 - 25);
+      // T.start();
+      ADCdata[index] = Ain;
+      index = index + 1;
       j= j + step;
       if(j > 1){
         j = 1;
       }
-    }
-    wait_us(80000);
-    wait_us(k);
-    for(i=1.0f;i > 0.0f; i -= step) {
-      // T.start();
-      // ADCdata[j] = Ain;
-      Sout = i;
-      wait_us(1000);
       // T.stop();
       // auto us=T.elapsed_time().count();
-      // printf("%d\n", j);
+      // printf ("Timer time: %llu us\n", us);
       // T.reset();
     }
-    // for(i=0.0f; i < 1.0f && j < sample; i += 0.25f) {
-    //   // T.start();
-    //   ADCdata[j] = Ain;
-    //   Sout = i;
-    //   wait_us(p);
-
-    //   j=j+1;
-    //   // T.stop();
-    //   // auto us=T.elapsed_time().count();
-    //   // printf("%d\n", j);
-    //   // T.reset();
-    // }
-    // for(i=0.834f; i  > 0.004f && j < sample; i -= 0.166f) {
-    //   // T.start();
-    //   ADCdata[j] = Ain;
-    //   Sout = i;
-    //   wait_us(p);
-    //   j=j+1;
-    //   // T.stop();
-    //   // auto us=T.elapsed_time().count();
-    //   // printf("%d\n", j);
-    //   // T.reset();
-    // }
+    for(c = 0; c < 80 && index < sample; c++) {
+      ADCdata[index] = Ain;
+      index = index + 1;
+      wait_us(1000 - 25);
+    }
+    k = x;
+    for(;k >0 && index < sample; k-=1000) {
+      ADCdata[index] = Ain;
+      index = index + 1;
+      wait_us(1000 - 25);
+    }
+    for(i=1.0f;i > 0.0f && index < sample; i -= step) {
+      Sout = i;
+      ADCdata[index] = Ain;
+      index = index + 1;
+      wait_us(1000 - 25);
+    }
   }
-  // printf("%f\r\n", freq*10);
-  // for (int k = 20; k < 60; k++){
-  //     printf("%f\r\n", ADCdata[k]);
-  //     wait_us(100);
-  // } 
+  printf("%f\r\n", fs);
+  for (int k = 0; k < sample; k++){
+      printf("%f\r\n", ADCdata[k]);
+      wait_us(100);
+  } 
 }
 void refresh_uLCD(){
   uLCD.cls(); 
