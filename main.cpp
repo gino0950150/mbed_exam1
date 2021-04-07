@@ -18,44 +18,69 @@ float period = 1;
 int sample = 100;
 float ADCdata[100];
 Timer T;
-float sel = 1/8;
+float sel = 0.125;
 
 void OutputA(){
-  float p = period - 33;
+  // float p = period - 33;
   float i;
-  int j = 0;
-
-  while (j < sample)
+  float j = 0;
+  float k = 80000 * (1 - sel);
+  float step = 1 / (80*sel);
+  int c = 0;
+  printf("%f\n", step);
+  while (1)
   {
-    for(i=0.0f; i < 1.0f && j < sample; i += 0.25f) {
+    j = 0;
+    for(c = 0; c < 80; c++) {
       // T.start();
-      ADCdata[j] = Ain;
+      Sout = j;
+      wait_us(1000);
+      j= j + step;
+      if(j > 1){
+        j = 1;
+      }
+    }
+    wait_us(80000);
+    wait_us(k);
+    for(i=1.0f;i > 0.0f; i -= step) {
+      // T.start();
+      // ADCdata[j] = Ain;
       Sout = i;
-      wait_us(p);
+      wait_us(1000);
+      // T.stop();
+      // auto us=T.elapsed_time().count();
+      // printf("%d\n", j);
+      // T.reset();
+    }
+    // for(i=0.0f; i < 1.0f && j < sample; i += 0.25f) {
+    //   // T.start();
+    //   ADCdata[j] = Ain;
+    //   Sout = i;
+    //   wait_us(p);
 
-      j=j+1;
-      // T.stop();
-      // auto us=T.elapsed_time().count();
-      // printf("%d\n", j);
-      // T.reset();
-    }
-    for(i=0.834f; i  > 0.004f && j < sample; i -= 0.166f) {
-      // T.start();
-      ADCdata[j] = Ain;
-      Sout = i;
-      wait_us(p);
-      j=j+1;
-      // T.stop();
-      // auto us=T.elapsed_time().count();
-      // printf("%d\n", j);
-      // T.reset();
-    }
+    //   j=j+1;
+    //   // T.stop();
+    //   // auto us=T.elapsed_time().count();
+    //   // printf("%d\n", j);
+    //   // T.reset();
+    // }
+    // for(i=0.834f; i  > 0.004f && j < sample; i -= 0.166f) {
+    //   // T.start();
+    //   ADCdata[j] = Ain;
+    //   Sout = i;
+    //   wait_us(p);
+    //   j=j+1;
+    //   // T.stop();
+    //   // auto us=T.elapsed_time().count();
+    //   // printf("%d\n", j);
+    //   // T.reset();
+    // }
   }
-  printf("%f\r\n", freq*10);
-  for (int k = 20; k < 60; k++){
-      printf("%f\r\n", ADCdata[k]);
-      wait_us(100);
-  } 
+  // printf("%f\r\n", freq*10);
+  // for (int k = 20; k < 60; k++){
+  //     printf("%f\r\n", ADCdata[k]);
+  //     wait_us(100);
+  // } 
 }
 void refresh_uLCD(){
   uLCD.cls(); 
@@ -65,7 +90,7 @@ void refresh_uLCD(){
   } else {
     uLCD.color(GREEN);
   }
-  uLCD.printf("%3f hz",sel);
+  uLCD.printf("%3f",sel);
 }
 void left_btn_pushed() {
   mode = 0;
@@ -79,8 +104,10 @@ void left_btn_isr() {
 }
 void right_btn_pushed() {
   mode = 0;
-  if(sel > 1/8) {
+  if(sel > 0.125) {
     sel = sel / 2;
+  } else {
+    sel = 0.125;
   }
   refresh_uLCD();
 }
@@ -90,7 +117,6 @@ void right_btn_isr() {
 void mid_btn_pushed() {
   mode = 1;
   refresh_uLCD();
-  period = 1 / freq *100000;
   r.start(&OutputA);
   // q.start(&ADC);
 }
