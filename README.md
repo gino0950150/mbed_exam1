@@ -1,6 +1,6 @@
 # mbed_exam1
 
-pictures in mbed directory!!!
+pictures in pictures directory!!!
 
 run FFT.py 
 
